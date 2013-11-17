@@ -7,9 +7,9 @@
 // lua development
 extern "C"
 {
-	#include "lua.h"
-	#include "lualib.h"
-	#include "lauxlib.h"
+#include "lua.h"
+#include "lualib.h"
+#include "lauxlib.h"
 }
 
 // include diluculum header files
@@ -25,14 +25,43 @@ extern "C"
 
 static Diluculum::LuaState* luaState;
 
+void traverseAst(Diluculum::LuaVariable node, string prefix = ""){
+    try {
+        string tag = node["tag"].value().asString();
+        cout << prefix << tag << endl;
+    } catch (Diluculum::TypeMismatchError e){
+        return;
+    }
+    Diluculum::LuaVariable data = node["data"];
+    int i = 1;
+    while (true){
+        try {
+            data[i]["tag"].value();
+            traverseAst(data[i], prefix + "  ");
+            i++;
+        } catch (Diluculum::TypeMismatchError e){
+            break;
+        }
+    }
+
+}
+
 int main(int argc, char *argv[])
 {
-	luaState = new Diluculum::LuaState;
-	luaState->doFile("../share/3dsoftviz/scripts/main.lua");
+    luaState = new Diluculum::LuaState;
+    luaState->doFile("../share/3dsoftviz/scripts/main.lua");
+    Diluculum::LuaVariable ast = (*luaState)["ast"];
+    traverseAst(ast);
 
-	QApplication app(argc, argv);
-	new Cleaner(&app);
-        AppCore::Core::getInstance(&app);
-        Manager::GraphManager::getInstance();
+    //    int luaInt = (luaState->operator []("a")).value().asInteger();
+
+    //    cout << "hello from c++" << endl;
+    //    cout << "luaVar = " << luaInt << endl;
+    luaState->~LuaState();
+
+    QApplication app(argc, argv);
+    new Cleaner(&app);
+    AppCore::Core::getInstance(&app);
+    Manager::GraphManager::getInstance();
 
 }
