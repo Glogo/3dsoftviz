@@ -51,17 +51,14 @@ int main(int argc, char *argv[])
     luaState = new Diluculum::LuaState;
     luaState->doFile("../share/3dsoftviz/scripts/main.lua");
     Diluculum::LuaVariable ast = (*luaState)["ast"];
-    traverseAst(ast);
+//    traverseAst(ast);
 
-    //    int luaInt = (luaState->operator []("a")).value().asInteger();
 
-    //    cout << "hello from c++" << endl;
-    //    cout << "luaVar = " << luaInt << endl;
+
     luaState->~LuaState();
 
     QApplication app(argc, argv);
     new Cleaner(&app);
     AppCore::Core::getInstance(&app);
     Manager::GraphManager::getInstance();
-
 }

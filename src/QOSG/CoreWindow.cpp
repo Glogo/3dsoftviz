@@ -55,6 +55,11 @@ CoreWindow::CoreWindow(QWidget *parent, Vwr::CoreGraph* coreGraph, QApplication*
 }
 void CoreWindow::createActions()
 {	
+    astButton = new QPushButton();
+    astButton->setText("New AST graph");
+    astButton->setFocusPolicy(Qt::NoFocus);
+    connect(astButton, SIGNAL(clicked()), this, SLOT(loadAST()));
+
 	quit = new QAction("Quit", this);
 	connect(quit, SIGNAL(triggered()), application, SLOT(quit())); 	
 
@@ -262,7 +267,8 @@ void CoreWindow::createMenus()
 }
 
 void CoreWindow::createLeftToolBar()
-{ 
+{
+
 	//inicializacia comboboxu typov vyberu
 	nodeTypeComboBox = new QComboBox();
 	nodeTypeComboBox->insertItems(0,(QStringList() << "All" << "Node" << "Edge"));
@@ -272,6 +278,14 @@ void CoreWindow::createLeftToolBar()
 	toolBar = new QToolBar("Tools",this);
 
 	QFrame * frame = createHorizontalFrame();
+
+    //nagy
+    frame->layout()->addWidget(astButton);
+    toolBar->addWidget(frame);
+    toolBar->addSeparator();
+    //nagy
+
+    frame = createHorizontalFrame();
 	
 	frame->layout()->addWidget(noSelect);
 	frame->layout()->addWidget(singleSelect);
@@ -502,6 +516,25 @@ void CoreWindow::saveLayoutToDB()
 void CoreWindow::sqlQuery()
 {
 	cout << lineEdit->text().toStdString() << endl;
+}
+
+void CoreWindow::loadAST()
+{
+    cout << "Create ast" << endl;
+    Manager::GraphManager * manager = Manager::GraphManager::getInstance();
+    cout << "Active graph is null: " << (manager->getActiveGraph() == NULL) << endl;
+    Data::Graph * graph = manager->createNewGraph("NewGraph");
+    cout << "Active graph is null: " << (manager->getActiveGraph() == NULL) << endl;
+
+    Data::Type *edgeType = NULL;
+    Data::Type *nodeType = NULL;
+
+    Importer::GraphOperations * operations = new Importer::GraphOperations(*graph);
+    operations->addDefaultTypes(edgeType, nodeType);
+
+    osg::Vec3 position = viewerWidget->getPickHandler()->getSelectionCenter(true);
+
+    graph->addNode("Node", nodeType , position);
 }
 
 void CoreWindow::playPause()

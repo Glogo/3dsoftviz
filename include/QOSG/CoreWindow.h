@@ -71,6 +71,12 @@ namespace QOSG
 				*/
 				void sqlQuery();
 
+                /**
+                *  \fn public  ast
+                *  \brief Create test ast
+                */
+                void loadAST();
+
 				/**
 				*  \fn public  playPause
 				*  \brief Play or pause the layout algorithm
@@ -287,6 +293,12 @@ namespace QOSG
 		*  \brief Pointer to save graph to database
 		*/
 		QAction * saveGraph;
+
+        /**
+        *  QPushButton * ast
+        *  \brief Action for generating ast graph
+        */
+        QPushButton * astButton;
 
 		/**
 		*  QPushButton * play
