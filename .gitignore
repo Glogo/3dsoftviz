@@ -1,4 +1,6 @@
 /.project
 _build
 _install
+_build-qtcreator
 CMakeLists.txt.user
+*~

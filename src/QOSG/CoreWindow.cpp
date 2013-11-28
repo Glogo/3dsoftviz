@@ -7,6 +7,7 @@
 #include "Layout/RestrictionRemovalHandler_RestrictionNodesRemover.h"
 
 #include "Importer/GraphOperations.h"
+#include "Metrics/Ast.h"
 
 using namespace QOSG;
 
@@ -59,6 +60,11 @@ void CoreWindow::createActions()
     astButton->setText("New AST graph");
     astButton->setFocusPolicy(Qt::NoFocus);
     connect(astButton, SIGNAL(clicked()), this, SLOT(loadAST()));
+
+    astFilterdButton = new QPushButton();
+    astFilterdButton->setText("New AST filtered");
+    astFilterdButton->setFocusPolicy(Qt::NoFocus);
+    connect(astFilterdButton, SIGNAL(clicked()), this, SLOT(loadFilteredAST()));
 
 	quit = new QAction("Quit", this);
 	connect(quit, SIGNAL(triggered()), application, SLOT(quit())); 	
@@ -281,6 +287,7 @@ void CoreWindow::createLeftToolBar()
 
     //nagy
     frame->layout()->addWidget(astButton);
+    frame->layout()->addWidget(astFilterdButton);
     toolBar->addWidget(frame);
     toolBar->addSeparator();
     //nagy
@@ -520,21 +527,18 @@ void CoreWindow::sqlQuery()
 
 void CoreWindow::loadAST()
 {
-    cout << "Create ast" << endl;
     Manager::GraphManager * manager = Manager::GraphManager::getInstance();
-    cout << "Active graph is null: " << (manager->getActiveGraph() == NULL) << endl;
-    Data::Graph * graph = manager->createNewGraph("NewGraph");
-    cout << "Active graph is null: " << (manager->getActiveGraph() == NULL) << endl;
+    Data::Graph * graph = manager->createNewGraph("AST");
 
-    Data::Type *edgeType = NULL;
-    Data::Type *nodeType = NULL;
+    Metrics::AstTest::visualize(graph);
+}
 
-    Importer::GraphOperations * operations = new Importer::GraphOperations(*graph);
-    operations->addDefaultTypes(edgeType, nodeType);
+void CoreWindow::loadFilteredAST()
+{
+    Manager::GraphManager * manager = Manager::GraphManager::getInstance();
+    Data::Graph * graph = manager->createNewGraph("filtered_AST");
 
-    osg::Vec3 position = viewerWidget->getPickHandler()->getSelectionCenter(true);
-
-    graph->addNode("Node", nodeType , position);
+    Metrics::AstTest::visualizeFiltered(graph);
 }
 
 void CoreWindow::playPause()

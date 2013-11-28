@@ -72,10 +72,16 @@ namespace QOSG
 				void sqlQuery();
 
                 /**
-                *  \fn public  ast
-                *  \brief Create test ast
+                *  \fn public  loadAST
+                *  \brief Create test ast graph
                 */
                 void loadAST();
+
+                /**
+                *  \fn public  loadFilteredAST
+                *  \brief Create test filterd ast graph
+                */
+                void loadFilteredAST();
 
 				/**
 				*  \fn public  playPause
@@ -295,10 +301,16 @@ namespace QOSG
 		QAction * saveGraph;
 
         /**
-        *  QPushButton * ast
+        *  QPushButton * astButton
         *  \brief Action for generating ast graph
         */
         QPushButton * astButton;
+
+        /**
+        *  QPushButton * astFilterdButton
+        *  \brief Action for generating filtered ast graph
+        */
+        QPushButton * astFilterdButton;
 
 		/**
 		*  QPushButton * play
