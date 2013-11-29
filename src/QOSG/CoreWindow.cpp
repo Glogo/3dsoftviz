@@ -57,12 +57,12 @@ CoreWindow::CoreWindow(QWidget *parent, Vwr::CoreGraph* coreGraph, QApplication*
 void CoreWindow::createActions()
 {	
     astButton = new QPushButton();
-    astButton->setText("New AST graph");
+    astButton->setText("AST");
     astButton->setFocusPolicy(Qt::NoFocus);
     connect(astButton, SIGNAL(clicked()), this, SLOT(loadAST()));
 
     astFilterdButton = new QPushButton();
-    astFilterdButton->setText("New AST filtered");
+    astFilterdButton->setText("AST filter");
     astFilterdButton->setFocusPolicy(Qt::NoFocus);
     connect(astFilterdButton, SIGNAL(clicked()), this, SLOT(loadFilteredAST()));
 

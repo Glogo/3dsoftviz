@@ -25,7 +25,9 @@ namespace Metrics
 
         static void traverseAst(Data::Graph * graph, Diluculum::LuaVariable luaNode, osg::ref_ptr<Data::Node> graphNode);
 
-        static void traverseAndFilterAst(Data::Graph * graph, Diluculum::LuaVariable luaNode, osg::ref_ptr<Data::Node> graphNode);
+        static bool traverseAndFilterAst(Data::Graph * graph, Diluculum::LuaVariable luaNode, osg::ref_ptr<Data::Node> graphNode);
+
+        static osg::ref_ptr<Data::Node> addLinkedNode(Data::Graph * graph, string name, osg::ref_ptr<Data::Node> graphNode);
 
     };
 }

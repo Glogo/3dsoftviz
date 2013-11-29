@@ -14,7 +14,7 @@ function printNode(node, prefix)
   --end
 end
 
-io.input("../share/3dsoftviz/scripts/test.lua");
+io.input("../share/3dsoftviz/scripts/test1.lua");
 testFile = io.read("*all")
 ast = metrics.processText(testFile);
 --printNode(ast, "")

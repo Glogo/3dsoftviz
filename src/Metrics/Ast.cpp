@@ -69,29 +69,59 @@ namespace Metrics
         }
     }
 
-    void AstTest::traverseAndFilterAst(Data::Graph * graph, Diluculum::LuaVariable luaNode, osg::ref_ptr<Data::Node> graphNode){
-        osg::ref_ptr<Data::Node> newNode;
+    bool AstTest::traverseAndFilterAst(Data::Graph * graph, Diluculum::LuaVariable luaNode,
+                                                           osg::ref_ptr<Data::Node> graphNode){
+        bool result = false;
+        osg::ref_ptr<Data::Node> newNode = NULL;
         try {
             string s = luaNode["tag"].value().asString();
-            cout << s << endl;
-            QString tag = QString::fromStdString(s);
-            newNode = graph->addNode(tag, nodeType);
-            if (graphNode != NULL) graph->addEdge(NULL, graphNode, newNode, AstTest::edgeType, true);
-        } catch (Diluculum::TypeMismatchError e){
-            return;
-        }
-        Diluculum::LuaVariable data = luaNode["data"];
-        int i = 1;
-        while (true){
-            try {
-                data[i]["tag"].value();
-                traverseAst(graph, data[i], newNode);
-                i++;
-            } catch (Diluculum::TypeMismatchError e){
-                break;
+            if (s != "SPACE" && s != "NEWLINE" && s != "EPSILON" && s != "IGNORED" && s != "CHUNK"
+                    && s != "Chunk" && s != "Block" && s != "Stat" && s != "_PrefixExp"
+                    && s != "_PrefixExpArgs" && s != "Args" && s != "symbol" && s != "ExpList"
+                    && s != "Exp" && s != "_SimpleExp" && s != "Name" && s != "ID"
+                    && s != "_PrefixExpDot" && s != "VarList" && s != "Var" && s != "STRING"
+                    && s != "keyword" && s != "BinOp" && s != "NUMBER"  && s != "NameList"
+                     && s != "ParList"  && s != "FuncName"  && s != "FuncBody"){
+                if (s != "STARTPOINT" && s != "GlobalFunction"  && s != "LocalFunction" && s != "If")
+                    s += ": " + luaNode["text"].value().asString();
+                cout << s << endl;
+                QString tag = QString::fromStdString(s);
+                newNode = graph->addNode(tag, nodeType);
+                if (graphNode != NULL) graph->addEdge(NULL, graphNode, newNode, AstTest::edgeType, true);
+                result = true;
             }
-        }
 
+            Diluculum::LuaVariable data = luaNode["data"];
+            int i = 1, j = 1;
+            if (newNode == NULL) newNode = graphNode;
+            bool addLink = true;
+            while (true){
+                try {
+                    if (addLink && s == "Chunk") {
+                        ostringstream os;
+                        os << j++;
+
+                        osg::ref_ptr<Data::Node> pom = addLinkedNode(graph, os.str(),newNode);
+                        newNode = pom;
+                    }
+                    data[i]["tag"].value();
+                    addLink = traverseAndFilterAst(graph, data[i], newNode);
+                    result |= addLink;
+                    i++;
+                } catch (Diluculum::TypeMismatchError e){
+                    break;
+                }
+            }
+            return result;
+        } catch (Diluculum::TypeMismatchError e){
+            return result;
+        }
+    }
+
+    osg::ref_ptr<Data::Node> AstTest::addLinkedNode(Data::Graph * graph, string name, osg::ref_ptr<Data::Node> graphNode){
+        osg::ref_ptr<Data::Node> newNode = graph->addNode(QString::fromStdString(name), nodeType);
+        if (graphNode != NULL) graph->addEdge(NULL, graphNode, newNode, AstTest::edgeType, true);
+        return newNode;
     }
 
 }
