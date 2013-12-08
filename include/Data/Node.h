@@ -470,7 +470,9 @@ namespace Data
 		*/
 		void setSettings(QMap<QString, QString> * val) { settings = val; }
 
-                void setLabelText(QString label) { labelText = label; }
+        void setLabelText(QString label) { labelText = label; }
+
+        QString getLabelText() { return labelText; }
 
 	private:
 
