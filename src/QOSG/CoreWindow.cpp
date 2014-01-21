@@ -66,6 +66,11 @@ void CoreWindow::createActions()
     astFilterdButton->setFocusPolicy(Qt::NoFocus);
     connect(astFilterdButton, SIGNAL(clicked()), this, SLOT(loadFilteredAST()));
 
+    functionCallGraphButton = new QPushButton();
+    functionCallGraphButton->setText("Function call");
+    functionCallGraphButton->setFocusPolicy(Qt::NoFocus);
+    connect(functionCallGraphButton, SIGNAL(clicked()), this, SLOT(loadFunctionCallGraph()));
+
 	quit = new QAction("Quit", this);
 	connect(quit, SIGNAL(triggered()), application, SLOT(quit())); 	
 
@@ -289,6 +294,7 @@ void CoreWindow::createLeftToolBar()
     frame->layout()->addWidget(astButton);
     frame->layout()->addWidget(astFilterdButton);
     toolBar->addWidget(frame);
+    toolBar->addWidget(functionCallGraphButton);
     toolBar->addSeparator();
     //nagy
 
@@ -539,6 +545,14 @@ void CoreWindow::loadFilteredAST()
     Data::Graph * graph = manager->createNewGraph("filtered_AST");
 
     Metrics::AstTest::visualizeFiltered(graph);
+}
+
+void CoreWindow::loadFunctionCallGraph()
+{
+    Manager::GraphManager * manager = Manager::GraphManager::getInstance();
+    Data::Graph * graph = manager->createNewGraph("function_call");
+
+    Metrics::AstTest::visualizeFunctionCall(graph);
 }
 
 void CoreWindow::playPause()

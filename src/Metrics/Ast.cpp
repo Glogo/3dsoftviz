@@ -49,7 +49,7 @@ namespace Metrics
         osg::ref_ptr<Data::Node> newNode;
         try {
             string s = luaNode["tag"].value().asString();
-            cout << s << endl;
+//            cout << s << endl;
             QString tag = QString::fromStdString(s);
             newNode = graph->addNode(tag, nodeType);
             if (graphNode != NULL) graph->addEdge(NULL, graphNode, newNode, AstTest::edgeType, true);
@@ -318,6 +318,17 @@ namespace Metrics
                 newNode = pom;
                 graph->addEdge(NULL, newNode, subNodes[k], AstTest::edgeType, true);
             }
+    }
+
+    void AstTest::visualizeFunctionCall(Data::Graph * graph){
+        Importer::GraphOperations * operations = new Importer::GraphOperations(*graph);
+        operations->addDefaultTypes(AstTest::edgeType, AstTest::nodeType);
+
+        luaState = new Diluculum::LuaState;
+        luaState->doFile("../share/3dsoftviz/scripts/function_call.lua");
+        Diluculum::LuaVariable ast = (*luaState)["result"];
+
+        luaState->~LuaState();
     }
 
 }

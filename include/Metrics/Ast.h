@@ -17,6 +17,8 @@ namespace Metrics
 
         static void visualizeFiltered(Data::Graph * graph);
 
+        static void visualizeFunctionCall(Data::Graph * graph);
+
     private:
         static Diluculum::LuaState* luaState;
 

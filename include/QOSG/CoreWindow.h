@@ -83,6 +83,12 @@ namespace QOSG
                 */
                 void loadFilteredAST();
 
+                /**
+                *  \fn public  loadFunctionCallGraph
+                *  \brief Creat function call graph
+                */
+                void loadFunctionCallGraph();
+
 				/**
 				*  \fn public  playPause
 				*  \brief Play or pause the layout algorithm
@@ -311,6 +317,12 @@ namespace QOSG
         *  \brief Action for generating filtered ast graph
         */
         QPushButton * astFilterdButton;
+
+        /**
+        *  QPushButton * functionCallGraphButton
+        *  \brief Action for generating function call graph
+        */
+        QPushButton * functionCallGraphButton;
 
 		/**
 		*  QPushButton * play
