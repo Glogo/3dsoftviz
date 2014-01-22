@@ -61,13 +61,18 @@ asts = {}
 for i,v in ipairs(files) do
   io.input(v);
   testFile = io.read("*all")
-  asts[i] = metrics.processText(testFile);
+  asts[v] = metrics.processText(testFile);
 end
 
 result = metrics.doGlobalMetrics(asts)
 print("done computing global metrics")
 --vardump(result)
-for k,v in pairs(result) do
+a = result["statements"]["FunctionCall"][1]
+--while a["parent"] ~= null and 
+--    (a["tag"] ~= "LocalFunction" or a["tag"] ~= "GlobalFunction") do
+  a = a["parent"]
+--end
+for k,v in pairs(a) do
   print(k,v)
 end
 
@@ -105,6 +110,7 @@ moduleDefinitions	table: 0xa309e3b0
             metrics.captures.infoflow	table: 0xaa2e38e0
             metrics.captures.AST	table: 0xaa2e3730
         moduleName	metrics
+        path  "../lib/..."
         moduleCalls	table: 0xaa37ee30
             lpeg	table: 0xaa3d12c8
             metrics.captures.halstead	table: 0xaa3d1388
@@ -129,7 +135,7 @@ LOC	table: 0xa3097990
   	lines_code	1945
   	lines_nonempty	2269
 statements	table: 0xa3098bc0
-  	FunctionCall	table: 0xa3098cb0 //not assign function
+  	FunctionCall	table: 0xa3098cb0 //not assign function, _PrefixExpArgs
         1 table
             order	1
             position	1000
@@ -160,7 +166,7 @@ functionDefinitions	table: 0xa3097348
         text	local function Cp(...)
 	        return lpeg.Cp() * lpeg.C(...)
         end
-        path	2
+        path	"../lib/..."
         tag	LocalFunction
         data	table: 0xaa286a00
         isGlobal	false

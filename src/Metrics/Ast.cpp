@@ -326,17 +326,57 @@ namespace Metrics
 
         luaState = new Diluculum::LuaState;
         luaState->doFile("../share/3dsoftviz/scripts/function_call.lua");
+
         Diluculum::LuaVariable asts = (*luaState)["result"];
+
+        QMap<string, osg::ref_ptr<Data::Node> > nodes;
+        QSet<QPair<QString, QString> > edges;
 
         Diluculum::LuaVariable defs = asts["functionDefinitions"];
         int i = 1;
         while (true){
             try {
                 string name = defs[i]["name"].value().asString();
-                int file = defs[i]["path"].value().asNumber();
-                string trimmedFileName = (*luaState)["files"][file].value().asString().substr(19);
-                cout << name << "," << trimmedFileName << endl;
-                graph->addNode(QString::fromStdString(name + "\n" + trimmedFileName), AstTest::nodeType);
+                string file = defs[i]["path"].value().asString();
+                string trimmedFileName = file.substr(19);
+                string nodeName = name + "\n" + trimmedFileName;
+
+//                cout << "definitions " << name << ", " << trimmedFileName << endl;
+                osg::ref_ptr<Data::Node> newNode = graph->addNode(QString::fromStdString(nodeName), AstTest::nodeType);
+                nodes.insert(nodeName, newNode);
+                i++;
+            } catch (Diluculum::TypeMismatchError e){
+                break;
+            }
+        }
+
+        Diluculum::LuaVariable calls = asts["statements"]["FunctionCall"];
+        while (true){
+            try {
+                string name = extractFunctionName(calls[i]["text"].value().asString());
+                string file = calls[i]["path"].value().asString();
+                string trimmedFileName = file.substr(19);
+                string nodeName = name + "\n" + trimmedFileName;
+                if (nodes.find(nodeName) != nodes.end()){
+//                    cout << "call found " << name << ", " << trimmedFileName << endl;
+                    string funcName = getFunctionName(calls[i]);
+                    if (funcName != ""){
+                        string node2 = funcName + "\n" + trimmedFileName;
+                        QPair<QString, QString> edge(QString::fromStdString(node2), QString::fromStdString(nodeName));
+                        if (!edges.contains(edge)){
+                            graph->addEdge(NULL,
+                                           nodes[node2], nodes[nodeName], AstTest::edgeType, true);
+                            edges.insert(edge);
+                        } else {
+//                            cout << "edge already found" << endl;
+                         }
+                    } else {
+                        //TODO not in any function
+                    }
+                } else {
+//                    cout << "call not found " << name << ", " << trimmedFileName << endl;
+                    //TODO out of module
+                }
                 i++;
             } catch (Diluculum::TypeMismatchError e){
                 break;
@@ -344,6 +384,25 @@ namespace Metrics
         }
 
         luaState->~LuaState();
+    }
+
+    string AstTest::extractFunctionName(string definition){
+        return definition.substr(0, definition.find('('));
+    }
+
+    string AstTest::getFunctionName(Diluculum::LuaVariable node){
+        while (true){
+            try {
+                if (node["tag"].value().asString() == "LocalFunction"
+                        || node["tag"].value().asString() == "GlobalFunction"
+                        || node["tag"].value().asString() == "Function")
+                    return node["name"].value().asString();
+                node = node["parent"];
+            } catch (Diluculum::TypeMismatchError e){
+                return "";
+            }
+        }
+        return "";
     }
 
 }

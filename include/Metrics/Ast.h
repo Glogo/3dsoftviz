@@ -52,6 +52,10 @@ namespace Metrics
         static bool isRelevantNode(string name);
 
         static void linkNodes(Data::Graph * graph, osg::ref_ptr<Data::Node> newNode,QList<osg::ref_ptr<Data::Node> > subNodes);
+
+        static string extractFunctionName(string definition);
+
+        static string getFunctionName(Diluculum::LuaVariable node);
     };
 }
 
