@@ -326,7 +326,22 @@ namespace Metrics
 
         luaState = new Diluculum::LuaState;
         luaState->doFile("../share/3dsoftviz/scripts/function_call.lua");
-        Diluculum::LuaVariable ast = (*luaState)["result"];
+        Diluculum::LuaVariable asts = (*luaState)["result"];
+
+        Diluculum::LuaVariable defs = asts["functionDefinitions"];
+        int i = 1;
+        while (true){
+            try {
+                string name = defs[i]["name"].value().asString();
+                int file = defs[i]["path"].value().asNumber();
+                string trimmedFileName = (*luaState)["files"][file].value().asString().substr(19);
+                cout << name << "," << trimmedFileName << endl;
+                graph->addNode(QString::fromStdString(name + "\n" + trimmedFileName), AstTest::nodeType);
+                i++;
+            } catch (Diluculum::TypeMismatchError e){
+                break;
+            }
+        }
 
         luaState->~LuaState();
     }

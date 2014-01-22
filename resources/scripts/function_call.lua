@@ -71,11 +71,7 @@ for k,v in pairs(result) do
   print(k,v)
 end
 
-print("-----------------------------------")
-
-for k,v in pairs(result['functionDefinitions']) do
-  print(v["path"], v["name"])
-end
+print("------------------------")
 
 --[[
 halstead	table: 0xa30984b0
