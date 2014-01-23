@@ -326,6 +326,7 @@ namespace Metrics
 
         luaState = new Diluculum::LuaState;
         luaState->doFile("../share/3dsoftviz/scripts/function_call.lua");
+//        if (true) return;
 
         Diluculum::LuaVariable asts = (*luaState)["result"];
 
@@ -341,7 +342,7 @@ namespace Metrics
                 string trimmedFileName = file.substr(19);
                 string nodeName = name + "\n" + trimmedFileName;
 
-//                cout << "definitions " << name << ", " << trimmedFileName << endl;
+                cout << "definitions " << name << ", " << trimmedFileName << endl;
                 osg::ref_ptr<Data::Node> newNode = graph->addNode(QString::fromStdString(nodeName), AstTest::nodeType);
                 nodes.insert(nodeName, newNode);
                 i++;
@@ -371,11 +372,14 @@ namespace Metrics
 //                            cout << "edge already found" << endl;
                          }
                     } else {
-                        //TODO not in any function
+                        //TODO not in any function / anonymous functions
+//                        cout << "call found " << name << ", " << trimmedFileName << endl;
+//                        cout << "not in any function" << endl;
                     }
                 } else {
-//                    cout << "call not found " << name << ", " << trimmedFileName << endl;
-                    //TODO out of module
+                    cout << "call not found " << name << ", " << trimmedFileName << endl;
+                    //TODO out of module / call not found halstead_capt.calculateHalstead, init.lua
+                    findImportedModule(asts, file, name);
                 }
                 i++;
             } catch (Diluculum::TypeMismatchError e){
@@ -393,16 +397,37 @@ namespace Metrics
     string AstTest::getFunctionName(Diluculum::LuaVariable node){
         while (true){
             try {
+//                cout << " " << node["tag"].value().asString();
                 if (node["tag"].value().asString() == "LocalFunction"
-                        || node["tag"].value().asString() == "GlobalFunction"
-                        || node["tag"].value().asString() == "Function")
+                        || node["tag"].value().asString() == "GlobalFunction"){
+                       // || node["tag"].value().asString() == "Function"){ inner funkcie
+//                    cout << endl;
+//                    cout << "returning " << node["name"].value().asString() << endl;
                     return node["name"].value().asString();
+                }
                 node = node["parent"];
             } catch (Diluculum::TypeMismatchError e){
+//                cout << "error: " << e.what() << endl;
                 return "";
             }
         }
         return "";
+    }
+
+    void AstTest::findImportedModule(Diluculum::LuaVariable asts, string file, string name){
+        Diluculum::LuaVariable moduleDefinitions = asts["moduleDefinitions"];
+        string moduleName = name.substr(0,name.find('.'));
+        int i = 1;
+        while (true){
+            try {
+                if (moduleDefinitions[i]["path"].value().asString() == file){
+                    Diluculum::LuaVariable moduleCalls = moduleDefinitions[i]["moduleCalls"];
+                }
+                i++;
+            } catch (Diluculum::TypeMismatchError e){
+                break;
+            }
+        }
     }
 
 }

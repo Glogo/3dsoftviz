@@ -67,12 +67,9 @@ end
 result = metrics.doGlobalMetrics(asts)
 print("done computing global metrics")
 --vardump(result)
-a = result["statements"]["FunctionCall"][1]
---while a["parent"] ~= null and 
---    (a["tag"] ~= "LocalFunction" or a["tag"] ~= "GlobalFunction") do
-  a = a["parent"]
---end
-for k,v in pairs(a) do
+print(result["moduleDefinitions"][3]["moduleName"])
+print(result["moduleDefinitions"][3]["path"])
+for k,v in pairs(result["moduleDefinitions"][3]["moduleCalls"]) do
   print(k,v)
 end
 

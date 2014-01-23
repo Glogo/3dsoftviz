@@ -56,6 +56,8 @@ namespace Metrics
         static string extractFunctionName(string definition);
 
         static string getFunctionName(Diluculum::LuaVariable node);
+
+        static void findImportedModule(Diluculum::LuaVariable asts, string file, string name);
     };
 }
 
