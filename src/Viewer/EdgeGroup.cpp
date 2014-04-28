@@ -35,6 +35,7 @@ EdgeGroup::~EdgeGroup(void)
  */
 void EdgeGroup::initEdges()
 {
+    cout << "initEdges" << std::endl;
 	osg::ref_ptr<osg::Group> allEdges = new osg::Group;
 
 	osg::ref_ptr<osg::Vec2Array> edgeTexCoords = new osg::Vec2Array;
@@ -101,6 +102,7 @@ void EdgeGroup::initEdges()
 
 void EdgeGroup::updateEdgeCoords()
 {
+    cout << "updateEdgeCoords" << std::endl;
 	osg::ref_ptr<osg::Vec2Array> edgeTexCoords = new osg::Vec2Array;
 	osg::ref_ptr<osg::Vec3Array> coordinates = new osg::Vec3Array;
 	osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array;
