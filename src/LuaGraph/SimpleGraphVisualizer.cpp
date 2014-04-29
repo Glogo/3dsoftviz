@@ -31,10 +31,12 @@ void Lua::SimpleGraphVisualizer::visualize()
             } else {
                 newEdge = currentGraph->addEdge(i.key(), i.value()->getLabel(), srcNode, dstNode, edgeType, true);
             }
+            newEdge->setEdgeColor(osg::Vec4f(1,0,1,1));
         } else {
             newEdge = currentGraph->addEdge(i.key(), i.value()->getLabel(), srcNode, dstNode, edgeType, false);
+            newEdge->setEdgeColor(osg::Vec4f(1,1,0,1));
         }
-        newEdge->setEdgeColor(osg::Vec4f(1,1,1,1));
+
         newEdge->setCamera(camera);
     }
     g->setObserver(this);

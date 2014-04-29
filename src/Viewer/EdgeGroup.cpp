@@ -5,6 +5,7 @@
 
 #include <osg/Depth>
 #include <osg/BlendFunc>
+#include <osg/CullFace>
 
 using namespace Vwr;
 
@@ -243,16 +244,27 @@ void EdgeGroup::createEdgeStateSets()
 	edgeStateSet = new osg::StateSet;
 
     edgeStateSet->setDataVariance(osg::Object::DYNAMIC);
-	edgeStateSet->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-	edgeStateSet->setTextureAttributeAndModes(0, TextureWrapper::getEdgeTexture(), osg::StateAttribute::ON);
-	edgeStateSet->setAttributeAndModes(new osg::BlendFunc, osg::StateAttribute::ON);
-	edgeStateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
+    edgeStateSet->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
 
-	edgeStateSet->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+    edgeStateSet->setTextureAttributeAndModes(0, TextureWrapper::getEdgeTexture(), osg::StateAttribute::ON);
 
-	osg::ref_ptr<osg::Depth> depth = new osg::Depth;
-	depth->setWriteMask(false);
-	edgeStateSet->setAttributeAndModes(depth, osg::StateAttribute::ON);
+    edgeStateSet->setMode(GL_BLEND, osg::StateAttribute::ON);
+    edgeStateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
+
+    edgeStateSet->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+
+    osg::ref_ptr<osg::Depth> depth = new osg::Depth;
+    depth->setWriteMask(false);
+    edgeStateSet->setAttributeAndModes(depth, osg::StateAttribute::ON);
+
+    osg::ref_ptr<osg::CullFace> cull = new osg::CullFace();
+    cull->setMode(osg::CullFace::BACK);
+    edgeStateSet->setAttributeAndModes(cull, osg::StateAttribute::ON);
+
+
+
+
+
 
 	orientedEdgeStateSet = new osg::StateSet;
 
