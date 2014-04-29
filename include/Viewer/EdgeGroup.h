@@ -106,6 +106,8 @@ private:
 		*/
 	osg::ref_ptr<osg::Geometry> orientedGeometry;
 
+    QMap<osg::ref_ptr<Data::Edge>, osg::ref_ptr<osg::Geode> > *geodes;
+
 
 	/**
 		*  \fn private  initEdges

@@ -35,6 +35,7 @@ EdgeGroup::~EdgeGroup(void)
  */
 void EdgeGroup::initEdges()
 {
+    /*
     cout << "initEdges" << std::endl;
 	osg::ref_ptr<osg::Group> allEdges = new osg::Group;
 
@@ -97,11 +98,14 @@ void EdgeGroup::initEdges()
 	allEdges->addChild(g1);
 	allEdges->addChild(g2);
 
-	this->edgeGroup = allEdges;
+    */
+    this->geodes = new QMap<osg::ref_ptr<Data::Edge>, osg::ref_ptr<osg::Geode> >();
+    this->edgeGroup = new osg::Group();
 }
 
 void EdgeGroup::updateEdgeCoords()
 {
+    /*
     cout << "updateEdgeCoords" << std::endl;
 	osg::ref_ptr<osg::Vec2Array> edgeTexCoords = new osg::Vec2Array;
 	osg::ref_ptr<osg::Vec3Array> coordinates = new osg::Vec3Array;
@@ -126,6 +130,51 @@ void EdgeGroup::updateEdgeCoords()
 	orientedGeometry->setVertexArray(coordinates);
 	orientedGeometry->setTexCoordArray(0, edgeTexCoords);
 	orientedGeometry->setColorArray(orientedEdgeColors);
+    */
+
+    for (QMap<qlonglong, osg::ref_ptr<Data::Edge> >::iterator i = edges->begin(); i != edges->end(); i++){
+        osg::ref_ptr<Data::Edge> edge = *i;
+
+        osg::Vec3 srcNodePosition = edge->getSrcNode()->getCurrentPosition();
+        osg::Vec3 dstNodePosition = edge->getDstNode()->getCurrentPosition();
+
+        edge->updateCoordinates(srcNodePosition, dstNodePosition);
+        if (!geodes->contains(edge)) {
+            osg::ref_ptr<osg::Geode> geode = new osg::Geode();
+            osg::ref_ptr<osg::Geometry> edgeQuad = new osg::Geometry;
+
+            edgeQuad->setVertexArray(edge->getCooridnates());
+
+            edgeQuad->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::QUADS,0,4));
+
+            edgeQuad->setTexCoordArray(0, edge->getEdgeTexCoords());
+
+            osg::ref_ptr<osg::Vec4Array> colorArray = new osg::Vec4Array;
+            colorArray->push_back(edge->getEdgeColor());
+            edgeQuad->setColorArray( colorArray);
+
+            edgeQuad->setColorBinding(osg::Geometry::BIND_OVERALL);
+            if (edge->isOriented())
+                edgeQuad->setStateSet(orientedEdgeStateSet);
+            else
+                edgeQuad->setStateSet(edgeStateSet);
+
+            geode->addDrawable(edgeQuad);
+
+            geodes->insert(edge, geode);
+            edgeGroup->addChild(geode);
+        } else {
+            osg::ref_ptr<osg::Geometry> edgeQuad = dynamic_cast<osg::Geometry *>(geodes->value(edge)->getDrawable(0));
+
+            edgeQuad->setVertexArray(edge->getCooridnates());
+
+            edgeQuad->setTexCoordArray(0, edge->getEdgeTexCoords());
+
+            osg::ref_ptr<osg::Vec4Array> colorArray = new osg::Vec4Array;
+            colorArray->push_back(edge->getEdgeColor());
+            edgeQuad->setColorArray( colorArray);
+        }
+    }
 }
 
 void EdgeGroup::getEdgeCoordinatesAndColors(osg::ref_ptr<Data::Edge> edge, int first,
@@ -158,41 +207,42 @@ void EdgeGroup::getEdgeCoordinatesAndColors(osg::ref_ptr<Data::Edge> edge, int f
 
 void EdgeGroup::synchronizeEdges()
 {
-	QList<qlonglong> edgeKeys = edges->keys();
+//	QList<qlonglong> edgeKeys = edges->keys();
 
-	for (int i = 0; i < 2; i++)
-	{
-		osg::ref_ptr<osg::Geometry> geometry = edgeGroup->getChild(i)->asGeode()->getDrawable(0)->asGeometry();
-		const osg::Geometry::PrimitiveSetList primitives = geometry->getPrimitiveSetList();
+//	for (int i = 0; i < 2; i++)
+//	{
+//		osg::ref_ptr<osg::Geometry> geometry = edgeGroup->getChild(i)->asGeode()->getDrawable(0)->asGeometry();
+//		const osg::Geometry::PrimitiveSetList primitives = geometry->getPrimitiveSetList();
 
-		for (unsigned int x = 0; x < primitives.size() ; x++)
-		{
-			Data::Edge * e = dynamic_cast<Data::Edge * >(primitives.at(x).get());
+//		for (unsigned int x = 0; x < primitives.size() ; x++)
+//		{
+//			Data::Edge * e = dynamic_cast<Data::Edge * >(primitives.at(x).get());
 
-			if (!edgeKeys.contains(e->getId()))
-			{
-				geometry->removePrimitiveSet(geometry->getPrimitiveSetIndex((e)));
-			}
-		}
-	}
+//			if (!edgeKeys.contains(e->getId()))
+//			{
+//				geometry->removePrimitiveSet(geometry->getPrimitiveSetIndex((e)));
+//			}
+//		}
+//	}
 
-	QMap<qlonglong, osg::ref_ptr<Data::Edge> >::iterator ie = edges->begin();
+//	QMap<qlonglong, osg::ref_ptr<Data::Edge> >::iterator ie = edges->begin();
 
-	while (ie != edges->end())
-	{
-		if (!(*ie)->isOriented() && geometry->getPrimitiveSetIndex((*ie)) == geometry->getNumPrimitiveSets())
-			geometry->addPrimitiveSet(*ie);
-		else if ((*ie)->isOriented() && orientedGeometry->getPrimitiveSetIndex((*ie)) == orientedGeometry->getNumPrimitiveSets())
-			orientedGeometry->addPrimitiveSet(*ie);
+//	while (ie != edges->end())
+//	{
+//		if (!(*ie)->isOriented() && geometry->getPrimitiveSetIndex((*ie)) == geometry->getNumPrimitiveSets())
+//			geometry->addPrimitiveSet(*ie);
+//		else if ((*ie)->isOriented() && orientedGeometry->getPrimitiveSetIndex((*ie)) == orientedGeometry->getNumPrimitiveSets())
+//			orientedGeometry->addPrimitiveSet(*ie);
 
-		ie++;
-	}
+//		ie++;
+//	}
 }
 
 void EdgeGroup::createEdgeStateSets()
 {
 	edgeStateSet = new osg::StateSet;
 
+    edgeStateSet->setDataVariance(osg::Object::DYNAMIC);
 	edgeStateSet->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
 	edgeStateSet->setTextureAttributeAndModes(0, TextureWrapper::getEdgeTexture(), osg::StateAttribute::ON);
 	edgeStateSet->setAttributeAndModes(new osg::BlendFunc, osg::StateAttribute::ON);
@@ -206,6 +256,7 @@ void EdgeGroup::createEdgeStateSets()
 
 	orientedEdgeStateSet = new osg::StateSet;
 
+    orientedEdgeStateSet->setDataVariance(osg::Object::DYNAMIC);
 	orientedEdgeStateSet->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
 	orientedEdgeStateSet->setTextureAttributeAndModes(0, TextureWrapper::getOrientedEdgeTexture(), osg::StateAttribute::ON);
 	orientedEdgeStateSet->setMode(GL_BLEND, osg::StateAttribute::ON);
