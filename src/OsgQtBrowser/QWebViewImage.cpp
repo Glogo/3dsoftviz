@@ -27,6 +27,9 @@ QWebViewImage::QWebViewImage()
 	_webPage = new QLogWebPage;
 	_webPage->settings()->setAttribute( QWebSettings::JavascriptEnabled, true );
 	_webPage->settings()->setAttribute( QWebSettings::PluginsEnabled, true );
+	_webPage->setPreferredContentsSize(QSize(1024,1024));
+	_webPage->setViewportSize(QSize(1024,1024));
+	_webPage->setActualVisibleContentRect(QRect(0,0,1024,1024));
 
 	_webView->setPage( _webPage );
 

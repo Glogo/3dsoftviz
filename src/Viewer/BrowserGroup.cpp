@@ -150,9 +150,13 @@ void BrowserGroup::addBrowser(const std::string &templateType, osg::Vec3 positio
 
 	// Add it to browser
 	osgWidget::GeometryHints hints( osg::Vec3( 0.0f,0.0f,0.0f ),
-									osg::Vec3( 150.0f,0.0f,0.0f ),
-									osg::Vec3( 0.0f,150.0f,0.0f ),
-									osg::Vec4( 0.0f,0.0f,0.0f,0.0f ) );
+									osg::Vec3( 200.0f,0.0f,0.0f ),
+									osg::Vec3( 0.0f,200.0f,0.0f ),
+									osg::Vec4( 0.0f,0.0f,0.0f,0.0f ),
+									osgWidget::GeometryHints::IGNORE_DOCUMENT_ASPECT_RATIO,
+									1024, // not working
+									1024  // not working
+									);
 
 	osg::ref_ptr<osgWidget::Browser> browser = new osgWidget::Browser;
 	browser->assign( webView, hints );
